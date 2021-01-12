@@ -274,7 +274,7 @@ jmnodes.theme-kms1 jmnode.selected {
     /*background-color: #11f;*/
     /*color:#fff;*/
 }
-/* 根节点样式 */
+/* 根节点样式  @todo 老大样式*/
 jmnodes.theme-kms1 jmnode.root {
     background: #4285F4;
     border-radius: 6px;

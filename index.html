@@ -15,8 +15,8 @@
 </head>
 
 <body>
-  <a id="saveBtn" href="javascript: void(0);" class="sui-btn btn-xlarge btn-primary">保存</a>
   <a id="screenShot" href="javascript: void(0);" class="sui-btn btn-xlarge btn-primary">截图</a>
+  <div id="img"></div>
   <div id="jsmind_container"></div>
   <script src="./lib/jquery.min.js"></script>
   <!-- <script src="./dist/kmsjsmap.min.js" type="text/javascript"></script> -->
@@ -26,45 +26,41 @@
     container: "jsmind_container",
     data: [
       { "id": "root", "isroot": true, "topic": "华北大魏有限公司" },
-      { "id": "sub1", "parentid": "root", "topic": "君主", "badge": 20, "direction": "left" },
-      { "id": "sub12", "parentid": "sub1", "topic": "曹操", "badge": 30 },
-      { "id": "sub121", "parentid": "sub1", "topic": "曹丕", "badge": 44 },
-      { "id": "sub122", "parentid": "sub1", "topic": "曹叡", "badge": 44 },
-      { "id": "sub123", "parentid": "sub1", "topic": "曹芳", "badge": 44 },
+      { "id": "sub1", "parentid": "root", "topic": "君主", "direction": "right" },
+      { "id": "sub12", "parentid": "sub1", "topic": "曹操" },
+      { "id": "sub121", "parentid": "sub1", "topic": "曹丕" },
+      { "id": "sub122", "parentid": "sub1", "topic": "曹叡" },
+      { "id": "sub123", "parentid": "sub1", "topic": "曹芳" },
+      
 
-      { "id": "sub2", "parentid": "root", "topic": "军师", "badge": 66, "direction": "right" },
-      { "id": "sub21", "parentid": "sub2", "topic": "郭嘉", "badge": 233 },
-      { "id": "sub22", "parentid": "sub2", "topic": "荀彧", "badge": 9 },
-      { "id": "sub23", "parentid": "sub2", "topic": "司马懿", "badge": 7, "isLink": true },
-      { "id": "sub24", "parentid": "sub2", "topic": "贾诩", "badge": 77 },
+      { "id": "sub2", "parentid": "root", "topic": "军师", "direction": "right" },
+      { "id": "sub21", "parentid": "sub2", "topic": "郭嘉" },
+      { "id": "sub22", "parentid": "sub2", "topic": "荀彧" },
+      { "id": "sub23", "parentid": "sub2", "topic": "司马懿" },
+      { "id": "sub24", "parentid": "sub2", "topic": "贾诩" },
 
-      { "id": "sub3", "parentid": "root", "topic": "大将", "badge": 45, "direction": "right" },
-      { "id": "sub31", "parentid": "sub3", "topic": "典韦", "badge": 1 },
-      { "id": "sub32", "parentid": "sub3", "topic": "夏侯惇", "badge": 2 },
-      { "id": "sub33", "parentid": "sub3", "topic": "于禁", "badge": 3 },
-      { "id": "sub34", "parentid": "sub3", "topic": "许褚", "badge": 4, "expanded": false },
+      { "id": "sub3", "parentid": "root", "topic": "大将", "direction": "right" },
+      { "id": "sub31", "parentid": "sub3", "topic": "典韦" },
+      { "id": "sub32", "parentid": "sub3", "topic": "夏侯惇" },
+      { "id": "sub33", "parentid": "sub3", "topic": "于禁" },
+      { "id": "sub34", "parentid": "sub3", "topic": "许褚", "expanded": true },
 
       { "id": "sub341", "parentid": "sub34", "topic": "士兵甲"},
-      { "id": "sub342", "parentid": "sub34", "topic": "士兵乙"}
+      { "id": "sub342", "parentid": "sub34", "topic": "士兵乙"},
+
+      { "id": "sub4", "parentid": "root", "topic": "君主2", "direction": "right" },
+      { "id": "sub42", "parentid": "sub4", "topic": "曹操" },
+      { "id": "sub421", "parentid": "sub4", "topic": "曹丕" },
+      { "id": "sub422", "parentid": "sub4", "topic": "曹叡" },
+      { "id": "sub423", "parentid": "sub4", "topic": "曹芳" },
     ],
-    editable: true,
-    onRelation: function(item) {
-      console.log('当前选择中的是', item)
-      kmsjsmap.setLinkStatus({
-        id: item.id,
-        isLink: item.data.isLink === true ? false : true
-      })
-    }
+    editable: false
   });
 
-  $('#saveBtn').click(function() {
-    kmsjsmap.save(function(data) {
-      console.log('啦啦啦啦', data)
-    })
-  })
-
   $('#screenShot').click(function() {
-    kmsjsmap.screenshot()
+    kmsjsmap.shootAsDataURL(function(data) {
+      document.getElementById("img").innerHTML=`<img src='${data}'>`;
+    })
   })
   </script>
 </body>

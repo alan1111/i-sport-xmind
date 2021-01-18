@@ -47,7 +47,8 @@ var _noop = function () {};
     }
   };
   var $h = function (n, t) {
-    n.innerHTML = t;
+    //@todo 展示 topic 内容
+    n.innerHTML = t.replace(/\n/g,'<br/>');
   };
   // detect isElement
   var $i = function (el) {
@@ -67,7 +68,6 @@ var _noop = function () {};
 
   var DEFAULT_OPTIONS = {
     container: "", // id of the container
-    editable: false, // you can change it in your options
     theme: null,
     mode: "full", // full or side
     support_html: true,
@@ -79,14 +79,9 @@ var _noop = function () {};
       line_color: "#555",
     },
     layout: {
-      hspace: 40,
-      vspace: 12,
+      hspace: 400, // @todo 调整框的间距
+      vspace: 50,
       pspace: 13,
-    },
-    default_event_handle: {
-      enable_mousedown_handle: true,
-      enable_click_handle: true,
-      enable_dblclick_handle: true,
     },
     shortcut: {
       enable: true,
@@ -94,7 +89,6 @@ var _noop = function () {};
       mapping: {
         addchild: 45, // Insert
         addbrother: 13, // Enter
-        editnode: 113, // F2
         delnode: 46, // Delete
         toggle: 32, // Space
         left: 37, // Left
@@ -127,7 +121,7 @@ var _noop = function () {};
 
   // ============= static object =============================================
   jm.direction = { left: -1, center: 0, right: 1 };
-  jm.event_type = { show: 1, resize: 2, edit: 3, select: 4 };
+  jm.event_type = { show: 1, resize: 2, select: 4 };
 
   jm.node = function (
     sId,
@@ -489,60 +483,6 @@ var _noop = function () {};
       return node;
     },
 
-    remove_node: function (node) {
-      if (!jm.util.is_node(node)) {
-        var the_node = this.get_node(node);
-        if (!the_node) {
-          logger.error("the node[id=" + node + "] can not be found.");
-          return false;
-        } else {
-          return this.remove_node(the_node);
-        }
-      }
-      if (!node) {
-        logger.error("fail, the node can not be found");
-        return false;
-      }
-      if (node.isroot) {
-        logger.error("fail, can not remove root node");
-        return false;
-      }
-
-      // 清除右上角badge
-      $('div.leo-badge[nodeid$="' + node.id + '"]').remove();
-
-      if (this.selected != null && this.selected.id == node.id) {
-        this.selected = null;
-      }
-      // clean all subordinate nodes
-      var children = node.children;
-      var ci = children.length;
-      while (ci--) {
-        this.remove_node(children[ci]);
-      }
-      // clean all children
-      children.length = 0;
-      // remove from parent's children
-      var sibling = node.parent.children;
-      var si = sibling.length;
-      while (si--) {
-        if (sibling[si].id == node.id) {
-          sibling.splice(si, 1);
-          break;
-        }
-      }
-      // remove from global nodes
-      delete this.nodes[node.id];
-      // clean all properties
-      for (var k in node) {
-        delete node[k];
-      }
-      // remove it's self
-      node = null;
-      //delete node;
-      return true;
-    },
-
     _put_node: function (node) {
       if (node.id in this.nodes) {
         logger.warn("the nodeid '" + node.id + "' has been already exist.");
@@ -565,14 +505,6 @@ var _noop = function () {};
 
   jm.format = {
     node_tree: {
-      example: {
-        meta: {
-          name: __name__,
-          version: __version__,
-        },
-        format: "node_tree",
-        data: { id: "root", topic: "jsMind Example" },
-      },
       get_mind: function (source) {
         var df = jm.format.node_tree;
         var mind = new jm.mind();
@@ -682,15 +614,6 @@ var _noop = function () {};
     },
 
     node_array: {
-      example: {
-        meta: {
-          name: __name__,
-          version: __version__,
-        },
-        format: "node_array",
-        data: [{ id: "root", topic: "jsMind Example", isroot: true }],
-      },
-
       get_mind: function (source) {
         var df = jm.format.node_array;
         var mind = new jm.mind();
@@ -701,19 +624,6 @@ var _noop = function () {};
         return mind;
       },
 
-      get_data: function (mind) {
-        var df = jm.format.node_array;
-        var json = {};
-        json.meta = {
-          name: mind.name,
-          author: mind.author,
-          version: mind.version,
-        };
-        json.format = "node_array";
-        json.data = [];
-        df._array(mind, json.data);
-        return json;
-      },
 
       _parse: function (mind, node_array) {
         var df = jm.format.node_array;
@@ -804,55 +714,9 @@ var _noop = function () {};
         }
         return data;
       },
-
-      _array: function (mind, node_array) {
-        var df = jm.format.node_array;
-        df._array_node(mind.root, node_array);
-      },
-
-      _array_node: function (node, node_array) {
-        var df = jm.format.node_array;
-        if (!(node instanceof jm.node)) {
-          return;
-        }
-        var o = {
-          id: node.id,
-          topic: node.topic,
-          expanded: node.expanded,
-        };
-        if (!!node.parent) {
-          o.parentid = node.parent.id;
-        }
-        if (node.isroot) {
-          o.isroot = true;
-        }
-        if (!!node.parent && node.parent.isroot) {
-          o.direction = node.direction == jm.direction.left ? "left" : "right";
-        }
-        if (node.data != null) {
-          var node_data = node.data;
-          for (var k in node_data) {
-            o[k] = node_data[k];
-          }
-        }
-        node_array.push(o);
-        var ci = node.children.length;
-        for (var i = 0; i < ci; i++) {
-          df._array_node(node.children[i], node_array);
-        }
-      },
     },
 
     freemind: {
-      example: {
-        meta: {
-          name: __name__,
-          version: __version__,
-        },
-        format: "freemind",
-        data:
-          '<map version="1.0.1"><node ID="root" TEXT="freemind Example"/></map>',
-      },
       get_mind: function (source) {
         var df = jm.format.freemind;
         var mind = new jm.mind();
@@ -1106,17 +970,6 @@ var _noop = function () {};
       },
     },
 
-    dom: {
-      //target,eventType,handler
-      add_event: function (t, e, h) {
-        if (!!t.addEventListener) {
-          t.addEventListener(e, h, false);
-        } else {
-          t.attachEvent("on" + e, h);
-        }
-      },
-    },
-
     canvas: {
       bezierto: function (ctx, x1, y1, x2, y2) {
         ctx.beginPath();
@@ -1129,56 +982,6 @@ var _noop = function () {};
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();
-      },
-      clear: function (ctx, x, y, w, h) {
-        ctx.clearRect(x, y, w, h);
-      },
-    },
-
-    file: {
-      read: function (file_data, fn_callback) {
-        var reader = new FileReader();
-        reader.onload = function () {
-          if (typeof fn_callback === "function") {
-            fn_callback(this.result, file_data.name);
-          }
-        };
-        reader.readAsText(file_data);
-      },
-
-      save: function (file_data, type, name) {
-        var blob;
-        if (typeof $w.Blob === "function") {
-          blob = new Blob([file_data], { type: type });
-        } else {
-          var BlobBuilder =
-            $w.BlobBuilder ||
-            $w.MozBlobBuilder ||
-            $w.WebKitBlobBuilder ||
-            $w.MSBlobBuilder;
-          var bb = new BlobBuilder();
-          bb.append(file_data);
-          blob = bb.getBlob(type);
-        }
-        if (navigator.msSaveBlob) {
-          navigator.msSaveBlob(blob, name);
-        } else {
-          var URL = $w.URL || $w.webkitURL;
-          var bloburl = URL.createObjectURL(blob);
-          var anchor = $c("a");
-          if ("download" in anchor) {
-            anchor.style.visibility = "hidden";
-            anchor.href = bloburl;
-            anchor.download = name;
-            $d.body.appendChild(anchor);
-            var evt = $d.createEvent("MouseEvents");
-            evt.initEvent("click", true, true);
-            anchor.dispatchEvent(evt);
-            $d.body.removeChild(anchor);
-          } else {
-            location.href = bloburl;
-          }
-        }
       },
     },
 
@@ -1280,17 +1083,9 @@ var _noop = function () {};
       this.layout.init();
       this.view.init();
       this.shortcut.init();
-
-      this._event_bind();
-
       jm.init_plugins(this);
     },
 
-    _event_bind: function () {
-      this.view.add_event(this, "mousedown", this.mousedown_handle);
-      this.view.add_event(this, "click", this.click_handle);
-      this.view.add_event(this, "dblclick", this.dblclick_handle);
-    },
 
     _reset: function () {
       this.view.reset();
@@ -1299,8 +1094,7 @@ var _noop = function () {};
     },
 
     _show: function (mind) {
-      var m = mind || jm.format.node_array.example;
-
+      var m = mind;
       this.mind = this.data.load(m);
       if (!this.mind) {
         logger.error("data.load error");
@@ -1318,34 +1112,12 @@ var _noop = function () {};
       this.view.show(true);
       logger.debug("view.show ok");
 
-      this.invoke_event_handle(jm.event_type.show, { data: [mind] });
     },
 
     show: function (mind) {
       this._reset();
       this._show(mind);
-    },
-
-    // callback(type ,data)
-    add_event_listener: function (callback) {
-      if (typeof callback === "function") {
-        this.event_handles.push(callback);
-      }
-    },
-
-    invoke_event_handle: function (type, data) {
-      var j = this;
-      $w.setTimeout(function () {
-        j._invoke_event_handle(type, data);
-      }, 0);
-    },
-
-    _invoke_event_handle: function (type, data) {
-      var l = this.event_handles.length;
-      for (var i = 0; i < l; i++) {
-        this.event_handles[i](type, data);
-      }
-    },
+    }
   };
 
   // ============= data provider =============================================
@@ -1456,11 +1228,7 @@ var _noop = function () {};
         var subnode = null;
         while (i--) {
           subnode = children[i];
-          if (subnode.direction == jm.direction.left) {
-            this._layout_direction_side(subnode, jm.direction.left, i);
-          } else {
-            this._layout_direction_side(subnode, jm.direction.right, i);
-          }
+          this._layout_direction_side(subnode, jm.direction.right, i);
         }
       }
     },
@@ -1712,167 +1480,6 @@ var _noop = function () {};
       };
     },
 
-    toggle_node: function (node) {
-      if (node.isroot) {
-        return;
-      }
-      if (node.expanded) {
-        this.collapse_node(node);
-      } else {
-        this.expand_node(node);
-      }
-    },
-    // 展开节点
-    expand_node: function (node) {
-      node.expanded = true;
-      this.part_layout(node);
-      this.set_visible(node.children, true);
-      this.toggleBadge(node.children, true);
-    },
-    // 收叠节点
-    collapse_node: function (node) {
-      node.expanded = false;
-      this.part_layout(node);
-      this.set_visible(node.children, false);
-      this.toggleBadge(node.children, false);
-    },
-    // 隐藏/显示 badger
-    // true: 显示
-    // false: 隐藏
-    toggleBadge: function (nodes, isShow) {
-      // console.log(isShow === true ? '显示' : '隐藏', nodes)
-      var that = this;
-
-      nodes.forEach(function (e) {
-        // var visible = e._data.layout.visible
-        var visible = that.jm.is_node_visible(e);
-        // console.log('visible', visible)
-        if (visible === true) return true;
-        // 多层级显示隐藏
-        that.toggleBadge(e.children, isShow);
-        var $ele = $('div.leo-badge[nodeid$="' + e.id + '"]');
-        if (isShow === true) {
-          $ele.show();
-        } else {
-          $ele.hide();
-        }
-      });
-    },
-
-    expand_all: function () {
-      var nodes = this.jm.mind.nodes;
-      var c = 0;
-      var node;
-      for (var nodeid in nodes) {
-        node = nodes[nodeid];
-        if (!node.expanded) {
-          node.expanded = true;
-          c++;
-        }
-      }
-      if (c > 0) {
-        var root = this.jm.mind.root;
-        this.part_layout(root);
-        this.set_visible(root.children, true);
-      }
-    },
-
-    collapse_all: function () {
-      var nodes = this.jm.mind.nodes;
-      var c = 0;
-      var node;
-      for (var nodeid in nodes) {
-        node = nodes[nodeid];
-        if (node.expanded && !node.isroot) {
-          node.expanded = false;
-          c++;
-        }
-      }
-      if (c > 0) {
-        var root = this.jm.mind.root;
-        this.part_layout(root);
-        this.set_visible(root.children, true);
-      }
-    },
-
-    expand_to_depth: function (target_depth, curr_nodes, curr_depth) {
-      if (target_depth < 1) {
-        return;
-      }
-      var nodes = curr_nodes || this.jm.mind.root.children;
-      var depth = curr_depth || 1;
-      var i = nodes.length;
-      var node = null;
-      while (i--) {
-        node = nodes[i];
-        if (depth < target_depth) {
-          if (!node.expanded) {
-            this.expand_node(node);
-          }
-          this.expand_to_depth(target_depth, node.children, depth + 1);
-        }
-        if (depth == target_depth) {
-          if (node.expanded) {
-            this.collapse_node(node);
-          }
-        }
-      }
-    },
-
-    part_layout: function (node) {
-      var root = this.jm.mind.root;
-      if (!!root) {
-        var root_layout_data = root._data.layout;
-        if (node.isroot) {
-          root_layout_data.outer_height_right = this._layout_offset_subnodes_height(
-            root_layout_data.right_nodes
-          );
-          root_layout_data.outer_height_left = this._layout_offset_subnodes_height(
-            root_layout_data.left_nodes
-          );
-        } else {
-          if (node._data.layout.direction == jm.direction.right) {
-            root_layout_data.outer_height_right = this._layout_offset_subnodes_height(
-              root_layout_data.right_nodes
-            );
-          } else {
-            root_layout_data.outer_height_left = this._layout_offset_subnodes_height(
-              root_layout_data.left_nodes
-            );
-          }
-        }
-        this.bounds.s = Math.max(
-          root_layout_data.outer_height_left,
-          root_layout_data.outer_height_right
-        );
-        this.cache_valid = false;
-      } else {
-        logger.warn("can not found root node");
-      }
-    },
-
-    set_visible: function (nodes, visible) {
-      var i = nodes.length;
-      var node = null;
-      var layout_data = null;
-      while (i--) {
-        node = nodes[i];
-        layout_data = node._data.layout;
-        if (node.expanded) {
-          this.set_visible(node.children, visible);
-        } else {
-          this.set_visible(node.children, false);
-        }
-        if (!node.isroot) {
-          node._data.layout.visible = visible;
-        }
-      }
-    },
-
-    is_expand: function (node) {
-      return node.expanded;
-    },
-
     is_visible: function (node) {
       var layout_data = node._data.layout;
       if ("visible" in layout_data && !layout_data.visible) {
@@ -1898,7 +1505,6 @@ var _noop = function () {};
     this.size = { w: 0, h: 0 };
 
     this.selected_node = null;
-    this.editing_node = null;
   };
 
   jm.view_provider.prototype = {
@@ -1915,44 +1521,17 @@ var _noop = function () {};
       this.e_panel = $c("div");
       this.e_canvas = $c("canvas");
       this.e_nodes = $c("jmnodes");
-      this.e_editor = $c("input");
 
       this.e_panel.className = "jsmind-inner";
       this.e_panel.appendChild(this.e_canvas);
       this.e_panel.appendChild(this.e_nodes);
 
-      this.e_editor.className = "jsmind-editor";
-      this.e_editor.type = "text";
-
-      this.actualZoom = 1;
-      this.zoomStep = 0.1;
-      this.minZoom = 0.5;
-      this.maxZoom = 2;
-
       var v = this;
-      jm.util.dom.add_event(this.e_editor, "keydown", function (e) {
-        var evt = e || event;
-        if (evt.keyCode == 13) {
-          v.edit_node_end();
-          evt.stopPropagation();
-        }
-      });
-      jm.util.dom.add_event(this.e_editor, "blur", function (e) {
-        v.edit_node_end();
-      });
 
       this.container.appendChild(this.e_panel);
 
       this.init_canvas();
     },
-
-    add_event: function (obj, event_name, event_handle) {
-      jm.util.dom.add_event(this.e_nodes, event_name, function (e) {
-        var evt = e || event;
-        event_handle.call(obj, evt);
-      });
-    },
-
     get_binded_nodeid: function (element) {
       if (element == null) {
         return null;
@@ -1975,8 +1554,6 @@ var _noop = function () {};
     reset: function () {
       logger.debug("view.reset");
       this.selected_node = null;
-      this.clear_lines();
-      this.clear_nodes();
       this.reset_theme();
     },
 
@@ -2058,6 +1635,7 @@ var _noop = function () {};
       if (node.isroot) {
         d.className = "root";
       } else {
+        d.classList.add('line-num'+ node.data.subNum)
         var d_e = $c("jmexpander"); // 右侧的小东西
         $t(d_e, "-");
         d_e.setAttribute("nodeid", node.id);
@@ -2075,7 +1653,7 @@ var _noop = function () {};
 
       // 创建右上角的小图标 雕漆里
       var badge = $c("div");
-      badge.className = "leo-badge";
+      badge.className = "alan-badge";
       parent_node.appendChild(badge);
       $t(badge, node._data.badge);
       badge.setAttribute("nodeid", node.id);
@@ -2085,128 +1663,10 @@ var _noop = function () {};
       d.setAttribute("nodeid", node.id);
       d.style.visibility = "hidden";
 
-      // 设置node节点的链接图标
-      if (node.data.isLink === true) {
-        $(d).addClass("isLink");
-      } else {
-        $(d).removeClass("isLink");
-      }
-
       this._reset_node_custom_style(d, node.data);
 
       parent_node.appendChild(d);
       view_data.element = d;
-    },
-
-    remove_node: function (node) {
-      if (this.selected_node != null && this.selected_node.id == node.id) {
-        this.selected_node = null;
-      }
-      if (this.editing_node != null && this.editing_node.id == node.id) {
-        node._data.view.element.removeChild(this.e_editor);
-        this.editing_node = null;
-      }
-      var children = node.children;
-      var i = children.length;
-      while (i--) {
-        this.remove_node(children[i]);
-      }
-      if (node._data.view) {
-        var element = node._data.view.element;
-        var expander = node._data.view.expander;
-        this.e_nodes.removeChild(element);
-        this.e_nodes.removeChild(expander);
-        node._data.view.element = null;
-        node._data.view.expander = null;
-      }
-    },
-
-    update_node: function (node) {
-      var view_data = node._data.view;
-      var element = view_data.element;
-      if (!!node.topic) {
-        if (this.opts.support_html) {
-          $h(element, node.topic);
-        } else {
-          $t(element, node.topic);
-        }
-      }
-      view_data.width = element.clientWidth;
-      view_data.height = element.clientHeight;
-    },
-
-    select_node: function (node) {
-      if (!!this.selected_node) {
-        this.selected_node._data.view.element.className = this.selected_node._data.view.element.className.replace(
-          /\s*selected\b/i,
-          ""
-        );
-        this.reset_node_custom_style(this.selected_node);
-      }
-      if (!!node) {
-        this.selected_node = node;
-        node._data.view.element.className += " selected";
-        this.clear_node_custom_style(node);
-      }
-    },
-
-    select_clear: function () {
-      this.select_node(null);
-    },
-
-    get_editing_node: function () {
-      return this.editing_node;
-    },
-
-    is_editing: function () {
-      return !!this.editing_node;
-    },
-
-    edit_node_begin: function (node) {
-      if (!node.topic) {
-        logger.warn("don't edit image nodes");
-        return;
-      }
-      if (this.editing_node != null) {
-        this.edit_node_end();
-      }
-      this.editing_node = node;
-      var view_data = node._data.view;
-      var element = view_data.element;
-      var topic = node.topic;
-      var ncs = getComputedStyle(element);
-      this.e_editor.value = topic;
-      this.e_editor.style.width =
-        element.clientWidth -
-        parseInt(ncs.getPropertyValue("padding-left")) -
-        parseInt(ncs.getPropertyValue("padding-right")) +
-        "px";
-      element.innerHTML = "";
-      element.appendChild(this.e_editor);
-      element.style.zIndex = 5;
-      this.e_editor.focus();
-      this.e_editor.select();
-    },
-
-    edit_node_end: function () {
-      if (this.editing_node != null) {
-        var node = this.editing_node;
-        this.editing_node = null;
-        var view_data = node._data.view;
-        var element = view_data.element;
-        var topic = this.e_editor.value;
-        element.style.zIndex = "auto";
-        element.removeChild(this.e_editor);
-        if (jm.util.text.is_empty(topic) || node.topic === topic) {
-          if (this.opts.support_html) {
-            $h(element, node.topic);
-          } else {
-            $t(element, node.topic);
-          }
-        } else {
-          this.jm.update_node(node.id, topic);
-        }
-      }
     },
 
     get_view_offset: function () {
@@ -2223,29 +1683,6 @@ var _noop = function () {};
       this.e_nodes.style.height = this.size.h + "px";
       this.show_nodes();
       this.show_lines();
-      //this.layout.cache_valid = true;
-      this.jm.invoke_event_handle(jm.event_type.resize, { data: [] });
-    },
-
-    zoomIn: function () {
-      return this.setZoom(this.actualZoom + this.zoomStep);
-    },
-
-    zoomOut: function () {
-      return this.setZoom(this.actualZoom - this.zoomStep);
-    },
-
-    setZoom: function (zoom) {
-      if (zoom < this.minZoom || zoom > this.maxZoom) {
-        return false;
-      }
-      this.actualZoom = zoom;
-      for (var i = 0; i < this.e_panel.children.length; i++) {
-        this.e_panel.children[i].style.transform = "scale(" + zoom + ")";
-        this.e_panel.children[i].style["-ms-transform"] = "scale(" + zoom + ")";
-      }
-      this.show(true);
-      return true;
     },
 
     _center_root: function () {
@@ -2270,42 +1707,6 @@ var _noop = function () {};
       }
     },
 
-    relayout: function () {
-      this.expand_size();
-      this._show();
-    },
-
-    save_location: function (node) {
-      var vd = node._data.view;
-      vd._saved_location = {
-        x: parseInt(vd.element.style.left) - this.e_panel.scrollLeft,
-        y: parseInt(vd.element.style.top) - this.e_panel.scrollTop,
-      };
-    },
-
-    restore_location: function (node) {
-      var vd = node._data.view;
-      this.e_panel.scrollLeft =
-        parseInt(vd.element.style.left) - vd._saved_location.x;
-      this.e_panel.scrollTop =
-        parseInt(vd.element.style.top) - vd._saved_location.y;
-    },
-
-    clear_nodes: function () {
-      var mind = this.jm.mind;
-      if (mind == null) {
-        return;
-      }
-      var nodes = mind.nodes;
-      var node = null;
-      for (var nodeid in nodes) {
-        node = nodes[nodeid];
-        node._data.view.element = null;
-        node._data.view.expander = null;
-      }
-      this.e_nodes.innerHTML = "";
-    },
-
     show_nodes: function () {
       var nodes = this.jm.mind.nodes;
       var node = null;
@@ -2313,7 +1714,6 @@ var _noop = function () {};
       var expander = null;
       var p = null;
       var p_expander = null;
-      var expander_text = "-";
       var view_data = null;
       var _offset = this.get_view_offset();
       for (var nodeid in nodes) {
@@ -2411,19 +1811,7 @@ var _noop = function () {};
       }
     },
 
-    clear_node_custom_style: function (node) {
-      var node_element = node._data.view.element;
-      node_element.style.backgroundColor = "";
-      node_element.style.color = "";
-    },
-
-    clear_lines: function (canvas_ctx) {
-      var ctx = canvas_ctx || this.canvas_ctx;
-      jm.util.canvas.clear(ctx, 0, 0, this.size.w, this.size.h);
-    },
-
     show_lines: function (canvas_ctx) {
-      this.clear_lines(canvas_ctx);
       var nodes = this.jm.mind.nodes;
       var node = null;
       var pin = null;
@@ -2470,11 +1858,9 @@ var _noop = function () {};
 
   jm.shortcut_provider.prototype = {
     init: function () {
-      jm.util.dom.add_event($d, "keydown", this.handler.bind(this));
 
       this.handles["addchild"] = this.handle_addchild;
       this.handles["addbrother"] = this.handle_addbrother;
-      this.handles["editnode"] = this.handle_editnode;
       this.handles["delnode"] = this.handle_delnode;
       this.handles["toggle"] = this.handle_toggle;
       this.handles["up"] = this.handle_up;
@@ -2498,9 +1884,6 @@ var _noop = function () {};
     },
 
     handler: function (e) {
-      if (this.jm.view.is_editing()) {
-        return;
-      }
       var evt = e || event;
       if (!this.opts.enable) {
         return true;
@@ -2508,88 +1891,6 @@ var _noop = function () {};
       var kc = evt.keyCode;
       if (kc in this._mapping) {
         this._mapping[kc].call(this, this.jm, e);
-      }
-    },
-
-    handle_addchild: function (_jm, e) {
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node) {
-        var nodeid = jm.util.uuid.newid();
-        var node = _jm.add_node(selected_node, nodeid, "New Node");
-        if (!!node) {
-          _jm.select_node(nodeid);
-          _jm.begin_edit(nodeid);
-        }
-      }
-    },
-    handle_addbrother: function (_jm, e) {
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node && !selected_node.isroot) {
-        var nodeid = jm.util.uuid.newid();
-        var node = _jm.insert_node_after(selected_node, nodeid, "New Node");
-        if (!!node) {
-          _jm.select_node(nodeid);
-          _jm.begin_edit(nodeid);
-        }
-      }
-    },
-    handle_editnode: function (_jm, e) {
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node) {
-        _jm.begin_edit(selected_node);
-      }
-    },
-    handle_delnode: function (_jm, e) {
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node && !selected_node.isroot) {
-        _jm.select_node(selected_node.parent);
-        _jm.remove_node(selected_node);
-      }
-    },
-    handle_toggle: function (_jm, e) {
-      var evt = e || event;
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node) {
-        _jm.toggle_node(selected_node.id);
-        evt.stopPropagation();
-        evt.preventDefault();
-      }
-    },
-    handle_up: function (_jm, e) {
-      var evt = e || event;
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node) {
-        var up_node = _jm.find_node_before(selected_node);
-        if (!up_node) {
-          var np = _jm.find_node_before(selected_node.parent);
-          if (!!np && np.children.length > 0) {
-            up_node = np.children[np.children.length - 1];
-          }
-        }
-        if (!!up_node) {
-          _jm.select_node(up_node);
-        }
-        evt.stopPropagation();
-        evt.preventDefault();
-      }
-    },
-
-    handle_down: function (_jm, e) {
-      var evt = e || event;
-      var selected_node = _jm.get_selected_node();
-      if (!!selected_node) {
-        var down_node = _jm.find_node_after(selected_node);
-        if (!down_node) {
-          var np = _jm.find_node_after(selected_node.parent);
-          if (!!np && np.children.length > 0) {
-            down_node = np.children[0];
-          }
-        }
-        if (!!down_node) {
-          _jm.select_node(down_node);
-        }
-        evt.stopPropagation();
-        evt.preventDefault();
       }
     },
 
@@ -2722,11 +2023,13 @@ var _noop = function () {};
     var test_line = null;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
+    
     for (var i = 0; i < text_len; i++) {
       test_line = line + chars[i];
-      if (ctx.measureText(test_line).width > w && i > 0) {
+      // @todo 当文案出现\n，换行展示
+      if ((ctx.measureText(test_line).width > w || chars[i]==='\n')&& i > 0) {
         ctx.fillText(line, x, y);
-        line = chars[i];
+        line = chars[i] === '\n' ? '' : chars[i];
         y += lineheight;
       } else {
         line = test_line;
@@ -2759,13 +2062,11 @@ var _noop = function () {};
 
     shoot: function (callback) {
       this.init();
-      this._watermark();
       var jms = this;
       this._draw(function () {
         if (!!callback) {
           callback(jms);
         }
-        jms.clean();
       });
     },
 
@@ -2782,29 +2083,12 @@ var _noop = function () {};
       }
     },
 
-    clean: function () {
-      var c = this.canvas_elem;
-      this.canvas_ctx.clearRect(0, 0, c.width, c.height);
-    },
-
     _draw: function (callback) {
       var ctx = this.canvas_ctx;
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       this._draw_lines();
       this._draw_nodes(callback);
-    },
-
-    _watermark: function () {
-      var c = this.canvas_elem;
-      var ctx = this.canvas_ctx;
-      ctx.textAlign = "right";
-      ctx.textBaseline = "bottom";
-      ctx.fillStyle = "#000";
-      ctx.font = "11px Verdana,Arial,Helvetica,sans-serif";
-      ctx.fillText("hizzgdev.github.io/jsmind", c.width - 5.5, c.height - 2.5);
-      ctx.textAlign = "left";
-      ctx.fillText($w.location, 5.5, c.height - 2.5);
     },
 
     _draw_lines: function () {
@@ -2908,6 +2192,7 @@ var _noop = function () {};
           }
         );
       }
+      // @todo 画文案
       if (!!node.topic) {
         if (text_overflow === "ellipsis") {
           jcanvas.text_ellipsis(ctx, node.topic, tb.x, tb.y, tb.w, tb.h);
@@ -2960,11 +2245,6 @@ var _noop = function () {};
       ctx.stroke();
     },
 
-    jm_event_handle: function (type, data) {
-      if (type === jsMind.event_type.resize) {
-        this.resize();
-      }
-    },
   };
 
   var screenshot_plugin = new jsMind.plugin("screenshot", function (jm) {
@@ -2973,16 +2253,12 @@ var _noop = function () {};
     jm.shoot = function () {
       jss.shoot();
     };
-    jm.add_event_listener(function (type, data) {
-      jss.jm_event_handle.call(jss, type, data);
-    });
   });
 
   jsMind.register_plugin(screenshot_plugin);
 })(window);
 
 // kmsjsmap
-// 思维导图JS库
 (function ($w) {
   if (!$w.jsMind) return;
 
@@ -3009,7 +2285,6 @@ var _noop = function () {};
   var kmsjsmap = {
     options: "",
     isInit: false,
-    editable: true,
     onRelation: _noop,
   };
 
@@ -3022,7 +2297,6 @@ var _noop = function () {};
     if (this.isInit) return;
     this.isInit = true;
     this.options = options;
-    this.editable = options.editable === true ? true : false;
     if (options.onRelation) this.onRelation = options.onRelation;
     this._load_jsmind();
   };
@@ -3033,7 +2307,6 @@ var _noop = function () {};
   kmsjsmap._load_jsmind = function () {
     var options = {
       container: this.options.container,
-      editable: this.editable,
       theme: "kms1",
       mode: "full",
       shortcut: {
@@ -3048,7 +2321,7 @@ var _noop = function () {};
     var mind = {
       meta: {
         name: "xmind",
-        author: "Leo",
+        author: "Alan",
         version: "1.0",
       },
       format: "node_array",

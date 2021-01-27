@@ -1818,6 +1818,7 @@ var _noop = function () {};
       var pout = null;
       var _offset = this.get_view_offset();
       for (var nodeid in nodes) {
+        // debugger
         node = nodes[nodeid];
         if (!!node.isroot) {
           continue;
@@ -1833,7 +1834,9 @@ var _noop = function () {};
 
     draw_line: function (pin, pout, offset, canvas_ctx) {
       var ctx = canvas_ctx || this.canvas_ctx;
-      ctx.strokeStyle = this.opts.line_color;
+      // @todo 控制线条颜色
+      // ctx.strokeStyle = this.opts.line_color;
+      ctx.strokeStyle = '#057AFF';
       ctx.lineWidth = this.opts.line_width;
       ctx.lineCap = "round";
 
@@ -2017,9 +2020,11 @@ var _noop = function () {};
   };
 
   jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
+    var colorfulText = text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/)[1];
+    var formatText = text.replace(/<.*>(.*)<.*>/, '$1');
     var line = "";
-    var text_len = text.length;
-    var chars = text.split("");
+    var text_len = formatText.length;
+    var chars = formatText.split("");
     var test_line = null;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
@@ -2028,14 +2033,31 @@ var _noop = function () {};
       test_line = line + chars[i];
       // @todo 当文案出现\n，换行展示
       if ((ctx.measureText(test_line).width > w || chars[i]==='\n')&& i > 0) {
-        ctx.fillText(line, x, y);
+        if (colorfulText && line.includes(colorfulText)) {
+          var normalText = line.replace(colorfulText, '');
+          var colorfulTextX = x + ctx.measureText(normalText).width;
+          ctx.fillText(normalText, x, y);
+          ctx.fillText(colorfulText, colorfulTextX, y);
+          ctx.fillStyle="red";
+        } else {
+          ctx.fillText(line, x, y);
+        }
         line = chars[i] === '\n' ? '' : chars[i];
         y += lineheight;
       } else {
         line = test_line;
       }
     }
-    ctx.fillText(line, x, y);
+    if (colorfulText && line.includes(colorfulText)) {
+      var normalText = line.replace(colorfulText, '');
+      var colorfulTextX = x + ctx.measureText(normalText).width;
+      ctx.fillText(normalText, x, y);
+      // 标出突出的字体颜色
+      ctx.fillStyle= '#ff6e0d';
+      ctx.fillText(colorfulText, colorfulTextX, y);
+    } else {
+      ctx.fillText(line, x, y);
+    }
   };
 
   jsMind.screenshot = function (jm) {

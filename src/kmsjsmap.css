@@ -37,7 +37,6 @@ jmnode {
 
 /* default theme */
 jmnode {
-  padding: 10px;
   background-color: #fff;
   color: #333;
   border-radius: 5px;
@@ -60,8 +59,42 @@ jmnodes.theme-kms1 jmnode {
 }
 /* 根节点样式  @todo 老大样式 */
 jmnodes.theme-kms1 jmnode.root {
-  background: #c0deff;
-  border-radius: 6px;
+  padding: 21px 35px 17px;
+  background: #94C6FF;
+  border-radius: 4px;
+  font-family: PingFangSC-Regular;
   font-size: 30px;
-  color: #333;
+  color: #FFFFFF;
+  letter-spacing: 0;
+  line-height: 42px;
+}
+jmnodes.theme-kms1 .line-num2 {
+  padding: 12px 23px 12px 24px;
+  background: #D9F7E9;
+  border-radius: 4px;
+  font-family: PingFangSC-Regular;
+  font-size: 24px;
+  color: #333333;
+  letter-spacing: 0;
+  line-height: 33px;
+}
+jmnodes.theme-kms1 .line-num3 {
+  padding: 12px 23px 12px 24px;
+  background: #D9F7E9;
+  border-radius: 4px;
+  font-family: PingFangSC-Regular;
+  font-size: 24px;
+  color: #333333;
+  letter-spacing: 0;
+  line-height: 33px;
+}
+jmnodes.theme-kms1 .line-num4 {
+  background: none;
+  box-shadow: none;
+  border-radius: 4px;
+  font-family: PingFangSC-Regular;
+  font-size: 24px;
+  color: #333333;
+  letter-spacing: 0;
+  line-height: 24px;
 }

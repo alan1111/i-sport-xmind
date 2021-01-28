@@ -30,167 +30,189 @@
     <script src="./src/kmsjsmap.js" type="text/javascript"></script>
     <script type="text/javascript">
       var content = [
-        {
-          id: "root",
-          parentid: null,
-          topic: "测试xmid\n3530.0",
-          subNum: 1,
-        },
-        {
-          id: "sub1",
-          parentid: "root",
-          topic: "测试\n男\n30\n2388.00",
-          subNum: 2,
-        },
-        {
-          id: "subsub1",
-          parentid: "sub1",
-          topic:
-            "安联住院宝保障计划\n保额/元\n10万保障期间\n1年期缴费期间\n一次交清保费/元\n235.00",
-          subNum: 3,
-        },
-        {
-          id: "subsubsub1",
-          parentid: "subsub1",
-          topic: "意外身故及伤残<span style='color: #ff6e0d'>最高10万</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub2",
-          parentid: "subsub1",
-          topic: "意外伤害医疗<span style='color: #ff6e0d'>最低1起</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub3",
-          parentid: "subsub1",
-          topic: "疾病住院医疗<span style='color: #ff6e0d'>1.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsub2",
-          parentid: "sub1",
-          topic:
-            "嘉乐保重大疾病保险\n保额/元\n10万保障期间\n保终身缴费期间\n30年期保费/元\n1753.00",
-          subNum: 3,
-        },
-        {
-          id: "subsubsub1",
-          parentid: "subsub2",
-          topic: "重大疾病<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub2",
-          parentid: "subsub2",
-          topic: "身故或全残<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub3",
-          parentid: "subsub2",
-          topic: "恶性肿瘤额外保险金<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub4",
-          parentid: "subsub2",
-          topic: "中症疾病<span style='color: #ff6e0d'>5.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub5",
-          parentid: "subsub2",
-          topic: "轻症疾病<span style='color: #ff6e0d'>3.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub6",
-          parentid: "subsub2",
-          topic: "轻症及中症豁免保险费<span style='color: #ff6e0d'></span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub7",
-          parentid: "subsub2",
-          topic: "恶性肿瘤豁免保险费<span style='color: #ff6e0d'></span>",
-          subNum: 4,
-        },
-        {
-          id: "sub2",
-          parentid: "root",
-          topic: "张三\n男\n30\n1143.00",
-          subNum: 2,
-        },
-        {
-          id: "subsub1",
-          parentid: "sub2",
-          topic:
-            "光大永明嘉多保重大疾病保险\\r\n\n保额/元\n10万保障期间\n保至70岁缴费期间\n30年期保费/元\n1143.00",
-          subNum: 3,
-        },
-        {
-          id: "subsubsub1",
-          parentid: "subsub1",
-          topic: "重大疾病<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub2",
-          parentid: "subsub1",
-          topic: "额外重大疾病<span style='color: #ff6e0d'>2.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub3",
-          parentid: "subsub1",
-          topic: "身故<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub4",
-          parentid: "subsub1",
-          topic: "轻症疾病<span style='color: #ff6e0d'>3.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub5",
-          parentid: "subsub1",
-          topic: "中症疾病<span style='color: #ff6e0d'>5.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub6",
-          parentid: "subsub1",
-          topic: "高度残疾<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub7",
-          parentid: "subsub1",
-          topic: "疾病终末期<span style='color: #ff6e0d'>10.0</span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub8",
-          parentid: "subsub1",
-          topic: "重大疾病豁免保险费<span style='color: #ff6e0d'></span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub9",
-          parentid: "subsub1",
-          topic: "轻症疾病豁免保险费<span style='color: #ff6e0d'></span>",
-          subNum: 4,
-        },
-        {
-          id: "subsubsub10",
-          parentid: "subsub1",
-          topic: "中症疾病豁免保险费<span style='color: #ff6e0d'></span>",
-          subNum: 4,
-        },
-      ];
-      content = content.map(item => {
+    {
+      "id": "root",
+      "parentid": null,
+      "topic": "测试xmid\n3530.0",
+      "subNum": 1
+    },
+    {
+      "id": "sub1",
+      "parentid": "root",
+      "topic": "测试\n男\n30\n2388.00",
+      "subNum": 2,
+      "line": 1
+    },
+    {
+      "id": "subsub11",
+      "parentid": "sub1",
+      "topic": "安联住院宝保障计划\n保额/元\n10万保障期间\n1年期缴费期间\n一次交清保费/元\n235.00",
+      "subNum": 3,
+      "line": 1
+    },
+    {
+      "id": "subsubsub111",
+      "parentid": "subsub11",
+      "topic": "意外身故及伤残<span style='color: #ff6e0d'>最高10万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub112",
+      "parentid": "subsub11",
+      "topic": "意外伤害医疗<span style='color: #ff6e0d'>最低1起万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub113",
+      "parentid": "subsub11",
+      "topic": "疾病住院医疗<span style='color: #ff6e0d'>1.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsub12",
+      "parentid": "sub1",
+      "topic": "嘉乐保重大疾病保险\n保额/元\n10万保障期间\n保终身缴费期间\n30年期保费/元\n1753.00",
+      "subNum": 3,
+      "line": 1
+    },
+    {
+      "id": "subsubsub121",
+      "parentid": "subsub12",
+      "topic": "重大疾病<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub122",
+      "parentid": "subsub12",
+      "topic": "身故或全残<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub123",
+      "parentid": "subsub12",
+      "topic": "恶性肿瘤额外保险金<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub124",
+      "parentid": "subsub12",
+      "topic": "中症疾病<span style='color: #ff6e0d'>5.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub125",
+      "parentid": "subsub12",
+      "topic": "轻症疾病<span style='color: #ff6e0d'>3.0万</span>",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub126",
+      "parentid": "subsub12",
+      "topic": "轻症及中症豁免保险费",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "subsubsub127",
+      "parentid": "subsub12",
+      "topic": "恶性肿瘤豁免保险费",
+      "subNum": 4,
+      "line": 1
+    },
+    {
+      "id": "sub2",
+      "parentid": "root",
+      "topic": "张三\n男\n30\n1143.00",
+      "subNum": 2,
+      "line": 2
+    },
+    {
+      "id": "subsub21",
+      "parentid": "sub2",
+      "topic": "光大永明嘉多保重大疾病保险\\r\n\n保额/元\n10万保障期间\n保至70岁缴费期间\n30年期保费/元\n1143.00",
+      "subNum": 3,
+      "line": 2
+    },
+    {
+      "id": "subsubsub211",
+      "parentid": "subsub21",
+      "topic": "重大疾病<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub212",
+      "parentid": "subsub21",
+      "topic": "额外重大疾病<span style='color: #ff6e0d'>2.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub213",
+      "parentid": "subsub21",
+      "topic": "身故<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub214",
+      "parentid": "subsub21",
+      "topic": "轻症疾病<span style='color: #ff6e0d'>3.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub215",
+      "parentid": "subsub21",
+      "topic": "中症疾病<span style='color: #ff6e0d'>5.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub216",
+      "parentid": "subsub21",
+      "topic": "高度残疾<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub217",
+      "parentid": "subsub21",
+      "topic": "疾病终末期<span style='color: #ff6e0d'>10.0万</span>",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub218",
+      "parentid": "subsub21",
+      "topic": "重大疾病豁免保险费",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub219",
+      "parentid": "subsub21",
+      "topic": "轻症疾病豁免保险费",
+      "subNum": 4,
+      "line": 2
+    },
+    {
+      "id": "subsubsub2110",
+      "parentid": "subsub21",
+      "topic": "中症疾病豁免保险费",
+      "subNum": 4,
+      "line": 2
+    }
+  ]
+  content = content.map(item => {
         const {id, parentid, topic, subNum} = item
         if (!parentid) {
           return {

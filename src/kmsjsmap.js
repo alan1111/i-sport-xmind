@@ -48,7 +48,7 @@ var _noop = function () {};
   };
   var $h = function (n, t) {
     //@todo 展示 topic 内容
-    n.innerHTML = t.replace(/\n/g,'<br/>');
+    n.innerHTML = t.replace(/\n/g, "<br/>");
   };
   // detect isElement
   var $i = function (el) {
@@ -79,7 +79,7 @@ var _noop = function () {};
       line_color: "#555",
     },
     layout: {
-      hspace: 400, // @todo 调整框的间距
+      hspace: 100, // @todo 调整框的间距
       vspace: 50,
       pspace: 13,
     },
@@ -624,7 +624,6 @@ var _noop = function () {};
         return mind;
       },
 
-
       _parse: function (mind, node_array) {
         var df = jm.format.node_array;
         var narray = node_array.slice(0);
@@ -1086,7 +1085,6 @@ var _noop = function () {};
       jm.init_plugins(this);
     },
 
-
     _reset: function () {
       this.view.reset();
       this.layout.reset();
@@ -1111,13 +1109,12 @@ var _noop = function () {};
 
       this.view.show(true);
       logger.debug("view.show ok");
-
     },
 
     show: function (mind) {
       this._reset();
       this._show(mind);
-    }
+    },
   };
 
   // ============= data provider =============================================
@@ -1630,12 +1627,24 @@ var _noop = function () {};
         view_data = {};
         node._data.view = view_data;
       }
-
+      var backgroundColorList = {
+        1: "#E2F0FF",
+        2: "#D9F7E9",
+        3: "#FFF5DD",
+        4: "#F7EAFF",
+        0: "#FFEFEF",
+      };
+      var { subNum, line } = node.data;
       var d = $c("jmnode");
+      if (line) {
+        d.style.backgroundColor = backgroundColorList[line % 5];
+      }
+      // d.style.backgroundColor='red'
       if (node.isroot) {
         d.className = "root";
       } else {
-        d.classList.add('line-num'+ node.data.subNum)
+        d.classList.add("line-num" + subNum);
+        d.classList.add("group-num" + line);
         var d_e = $c("jmexpander"); // 右侧的小东西
         $t(d_e, "-");
         d_e.setAttribute("nodeid", node.id);
@@ -1823,20 +1832,32 @@ var _noop = function () {};
         if (!!node.isroot) {
           continue;
         }
+        var lineNum = node.parent.isroot ? 0 : node.data.line;
         if ("visible" in node._data.layout && !node._data.layout.visible) {
           continue;
         }
         pin = this.layout.get_node_point_in(node);
         pout = this.layout.get_node_point_out(node.parent);
-        this.draw_line(pout, pin, _offset, canvas_ctx);
+        this.draw_line(pout, pin, _offset, canvas_ctx, lineNum);
       }
     },
 
-    draw_line: function (pin, pout, offset, canvas_ctx) {
+    draw_line: function (pin, pout, offset, canvas_ctx, line) {
       var ctx = canvas_ctx || this.canvas_ctx;
       // @todo 控制线条颜色
       // ctx.strokeStyle = this.opts.line_color;
-      ctx.strokeStyle = '#057AFF';
+      var lineColorList = {
+        1: "#057AFF",
+        2: "#14CC76",
+        3: "#FF8B3D",
+        4: "#BC72EA",
+        0: "#FE3131",
+      };
+      if (line) {
+        ctx.strokeStyle = lineColorList[line % 5];
+      } else {
+        ctx.strokeStyle = "#057AFF";
+      }
       ctx.lineWidth = this.opts.line_width;
       ctx.lineCap = "round";
 
@@ -1861,7 +1882,6 @@ var _noop = function () {};
 
   jm.shortcut_provider.prototype = {
     init: function () {
-
       this.handles["addchild"] = this.handle_addchild;
       this.handles["addbrother"] = this.handle_addbrother;
       this.handles["delnode"] = this.handle_delnode;
@@ -2020,40 +2040,44 @@ var _noop = function () {};
   };
 
   jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
-    var colorfulText = text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/)[1];
-    var formatText = text.replace(/<.*>(.*)<.*>/, '$1');
+    var colorfulText =
+      text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/)[1];
+    var formatText = text.replace(/<.*>(.*)<.*>/, "$1");
     var line = "";
     var text_len = formatText.length;
     var chars = formatText.split("");
     var test_line = null;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    
+
     for (var i = 0; i < text_len; i++) {
       test_line = line + chars[i];
       // @todo 当文案出现\n，换行展示
-      if ((ctx.measureText(test_line).width > w || chars[i]==='\n')&& i > 0) {
+      if (
+        (ctx.measureText(test_line).width > w || chars[i] === "\n") &&
+        i > 0
+      ) {
         if (colorfulText && line.includes(colorfulText)) {
-          var normalText = line.replace(colorfulText, '');
+          var normalText = line.replace(colorfulText, "");
           var colorfulTextX = x + ctx.measureText(normalText).width;
           ctx.fillText(normalText, x, y);
           ctx.fillText(colorfulText, colorfulTextX, y);
-          ctx.fillStyle="red";
+          ctx.fillStyle = "red";
         } else {
           ctx.fillText(line, x, y);
         }
-        line = chars[i] === '\n' ? '' : chars[i];
+        line = chars[i] === "\n" ? "" : chars[i];
         y += lineheight;
       } else {
         line = test_line;
       }
     }
     if (colorfulText && line.includes(colorfulText)) {
-      var normalText = line.replace(colorfulText, '');
+      var normalText = line.replace(colorfulText, "");
       var colorfulTextX = x + ctx.measureText(normalText).width;
       ctx.fillText(normalText, x, y);
       // 标出突出的字体颜色
-      ctx.fillStyle= '#ff6e0d';
+      ctx.fillStyle = "#ff6e0d";
       ctx.fillText(colorfulText, colorfulTextX, y);
     } else {
       ctx.fillText(line, x, y);
@@ -2266,7 +2290,6 @@ var _noop = function () {};
       ctx.closePath();
       ctx.stroke();
     },
-
   };
 
   var screenshot_plugin = new jsMind.plugin("screenshot", function (jm) {

@@ -1,6 +1,7 @@
 var $conTextMenu = "";
 // an noop function define
 var _noop = function () {};
+var $deep = 0;
 
 (function ($w) {
   "use strict";
@@ -1635,6 +1636,9 @@ var _noop = function () {};
         0: "#FFEFEF",
       };
       var { subNum, line } = node.data;
+      if ($deep < subNum) {
+        $deep = subNum;
+      }
       var d = $c("jmnode");
       if (line) {
         d.style.backgroundColor = backgroundColorList[line % 5];
@@ -2174,8 +2178,12 @@ var _noop = function () {};
         node.ready = true;
         return;
       }
-
-      var bgcolor = css(ncs, "background-color");
+      var bgcolor = '';
+      if ($deep !== +node.data.subNum) {
+        bgcolor = css(ncs, "background-color")
+      } else {
+        bgcolor = '#fff'
+      }
       var round_radius = parseInt(css(ncs, "border-top-left-radius"));
       var color = css(ncs, "color");
       var padding_left = parseInt(css(ncs, "padding-left"));

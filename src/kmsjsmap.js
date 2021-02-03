@@ -2044,8 +2044,9 @@ var $deep = 0;
   };
 
   jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
-    var colorfulText =
-      text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/)[1];
+    var matchText = text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/);
+    var colorfulText = matchText && matchText[0].includes("color") ? matchText[1] : "";
+    var boldText = matchText && matchText[0].includes("font-weight") ? matchText[1] : "";
     var formatText = text.replace(/<.*>(.*)<.*>/, "$1");
     var line = "";
     var text_len = formatText.length;
@@ -2083,6 +2084,15 @@ var $deep = 0;
       // 标出突出的字体颜色
       ctx.fillStyle = "#ff6e0d";
       ctx.fillText(colorfulText, colorfulTextX, y);
+    } else if (boldText) {
+      var normalTextList = line.split(boldText);
+      var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
+      ctx.fillText(normalTextList[0], x, y);
+      var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldText).width;
+      ctx.fillText(normalTextList[1], normalTextX, y);
+      // 字体加粗
+      ctx.font = 'bolder 24px PingFangSC-Regular';
+      ctx.fillText(boldText, bolderTextX, y);
     } else {
       ctx.fillText(line, x, y);
     }
@@ -2178,11 +2188,11 @@ var $deep = 0;
         node.ready = true;
         return;
       }
-      var bgcolor = '';
+      var bgcolor = "";
       if ($deep !== +node.data.subNum) {
-        bgcolor = css(ncs, "background-color")
+        bgcolor = css(ncs, "background-color");
       } else {
-        bgcolor = '#fff'
+        bgcolor = "#fff";
       }
       var round_radius = parseInt(css(ncs, "border-top-left-radius"));
       var color = css(ncs, "color");

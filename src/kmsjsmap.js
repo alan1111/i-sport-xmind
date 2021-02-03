@@ -2044,10 +2044,19 @@ var $deep = 0;
   };
 
   jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
-    var matchText = text.match(/<.*>(.*)<.*>/) && text.match(/<.*>(.*)<.*>/);
-    var colorfulText = matchText && matchText[0].includes("color") ? matchText[1] : "";
-    var boldText = matchText && matchText[0].includes("font-weight") ? matchText[1] : "";
-    var formatText = text.replace(/<.*>(.*)<.*>/, "$1");
+    var matchText = text.match(/<.*>(.*)<.*>/g) && text.match(/<.*>(.*)<.*>/g);
+    var colorfulTexts = [];
+    var boldTexts = [];
+    matchText && matchText.forEach(item => {
+      var matchItem = item.match(/<.*>(.*)<.*>/)
+      if (item.includes("color")) {
+        colorfulTexts.push(matchItem[1])
+      }
+      if (item.includes("font-weight")) {
+        boldTexts.push(matchItem[1])
+      }
+    })
+    var formatText = text.replace(/<.*>(.*)<.*>/g, "$1");
     var line = "";
     var text_len = formatText.length;
     var chars = formatText.split("");
@@ -2062,12 +2071,26 @@ var $deep = 0;
         (ctx.measureText(test_line).width > w || chars[i] === "\n") &&
         i > 0
       ) {
-        if (colorfulText && line.includes(colorfulText)) {
-          var normalText = line.replace(colorfulText, "");
+        if (colorfulTexts[0] && line.includes(colorfulTexts[0])) {
+          var normalText = line.replace(colorfulTexts[0], "");
           var colorfulTextX = x + ctx.measureText(normalText).width;
           ctx.fillText(normalText, x, y);
-          ctx.fillText(colorfulText, colorfulTextX, y);
-          ctx.fillStyle = "red";
+          ctx.fillStyle = "#ff6e0d";
+          ctx.fillText(colorfulTexts[0], colorfulTextX, y);
+          colorfulTexts.shift();
+          ctx.fillStyle = "#fff";
+        } else if (boldTexts[0] && line.includes(boldTexts[0])) {
+          var normalTextList = line.split(boldTexts[0]);
+          var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
+          ctx.fillText(normalTextList[0], x, y);
+          // 字体加粗
+          ctx.font = 'bolder 24px PingFangSC-Regular';
+          ctx.fillText(boldTexts[0], bolderTextX, y);
+          // 初始化字体
+          ctx.font = 'normal 24px PingFangSC-Regular';
+          var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldTexts[0]).width;
+          ctx.fillText(normalTextList[1], normalTextX, y);
+          boldTexts.shift();
         } else {
           ctx.fillText(line, x, y);
         }
@@ -2077,22 +2100,22 @@ var $deep = 0;
         line = test_line;
       }
     }
-    if (colorfulText && line.includes(colorfulText)) {
-      var normalText = line.replace(colorfulText, "");
+    if (colorfulTexts.length && line.includes(colorfulTexts)) {
+      var normalText = line.replace(colorfulTexts, "");
       var colorfulTextX = x + ctx.measureText(normalText).width;
       ctx.fillText(normalText, x, y);
       // 标出突出的字体颜色
       ctx.fillStyle = "#ff6e0d";
-      ctx.fillText(colorfulText, colorfulTextX, y);
-    } else if (boldText) {
-      var normalTextList = line.split(boldText);
+      ctx.fillText(colorfulTexts, colorfulTextX, y);
+    } else if (boldTexts.length && line.includes(boldTexts)) {
+      var normalTextList = line.split(boldTexts);
       var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
       ctx.fillText(normalTextList[0], x, y);
-      var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldText).width;
+      var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldTexts).width;
       ctx.fillText(normalTextList[1], normalTextX, y);
       // 字体加粗
-      ctx.font = 'bolder 24px PingFangSC-Regular';
-      ctx.fillText(boldText, bolderTextX, y);
+      ctx.font = 'bolder PingFangSC-Regular';
+      ctx.fillText(boldTexts, bolderTextX, y);
     } else {
       ctx.fillText(line, x, y);
     }

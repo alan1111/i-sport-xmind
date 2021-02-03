@@ -2043,7 +2043,7 @@ var $deep = 0;
     ctx.arcTo(x, y, x + w, y, r);
   };
 
-  jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight) {
+  jcanvas.text_multiline = function (ctx, text, x, y, w, h, lineheight, color) {
     var matchText = text.match(/<.*>(.*)<.*>/g) && text.match(/<.*>(.*)<.*>/g);
     var colorfulTexts = [];
     var boldTexts = [];
@@ -2078,7 +2078,7 @@ var $deep = 0;
           ctx.fillStyle = "#ff6e0d";
           ctx.fillText(colorfulTexts[0], colorfulTextX, y);
           colorfulTexts.shift();
-          ctx.fillStyle = "#fff";
+          ctx.fillStyle = color;
         } else if (boldTexts[0] && line.includes(boldTexts[0])) {
           var normalTextList = line.split(boldTexts[0]);
           var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
@@ -2292,7 +2292,8 @@ var $deep = 0;
             tb.y,
             tb.w,
             tb.h,
-            line_height
+            line_height,
+            color
           );
         }
       }

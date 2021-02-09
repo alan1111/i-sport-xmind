@@ -2296,40 +2296,9 @@ var $deep = 0;
           );
         }
       }
-      if (!!view_data.expander) {
-        this._draw_expander(view_data.expander);
-      }
       if (!("background-image" in node.data)) {
         node.ready = true;
       }
-    },
-
-    _draw_expander: function (expander) {
-      var ctx = this.canvas_ctx;
-      var ncs = getComputedStyle(expander);
-      if (!is_visible(ncs)) {
-        return;
-      }
-
-      var style_left = css(ncs, "left");
-      var style_top = css(ncs, "top");
-      var font = css(ncs, "font");
-      var left = parseInt(style_left);
-      var top = parseInt(style_top);
-      var is_plus = expander.innerHTML === "+";
-
-      ctx.lineWidth = 1;
-
-      ctx.beginPath();
-      ctx.arc(left + 7, top + 7, 5, 0, Math.PI * 2, true);
-      ctx.moveTo(left + 10, top + 7);
-      ctx.lineTo(left + 4, top + 7);
-      if (is_plus) {
-        ctx.moveTo(left + 7, top + 4);
-        ctx.lineTo(left + 7, top + 10);
-      }
-      ctx.closePath();
-      ctx.stroke();
     },
   };
 

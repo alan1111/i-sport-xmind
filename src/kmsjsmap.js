@@ -1743,7 +1743,7 @@ var $deep = 0;
         p = this.layout.get_node_point(node);
         view_data.abs_x = _offset.x + p.x;
         view_data.abs_y = _offset.y + p.y;
-        node_element.style.left = _offset.x + p.x + 8 + "px";
+        node_element.style.left = _offset.x + p.x + (node.isroot ? -240 : 8) + "px";
         node_element.style.top = _offset.y + p.y + "px";
         node_element.style.display = "";
         node_element.style.visibility = "visible";
@@ -2238,7 +2238,7 @@ var $deep = 0;
         css(ncs, "font-family");
 
       var rb = {
-        x: view_data.abs_x,
+        x: node.isroot ? view_data.abs_x - 240 : view_data.abs_x,
         y: view_data.abs_y,
         w: view_data.width + 1,
         h: view_data.height + 1,

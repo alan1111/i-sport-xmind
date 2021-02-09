@@ -974,7 +974,10 @@ var $deep = 0;
       bezierto: function (ctx, x1, y1, x2, y2) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
-        ctx.bezierCurveTo(x1 + ((x2 - x1) * 2) / 3, y1, x1, y2, x2, y2);
+        ctx.lineTo((x2 - x1) / 2 + x1, y1);
+        ctx.lineTo((x2 - x1) / 2 + x1, y2);
+        ctx.lineTo(x2, y2);
+        // ctx.bezierCurveTo(x1 + ((x2 - x1) * 2) / 3, y1, x1, y2, x2, y2);
         ctx.stroke();
       },
       lineto: function (ctx, x1, y1, x2, y2) {
@@ -1743,7 +1746,7 @@ var $deep = 0;
         p = this.layout.get_node_point(node);
         view_data.abs_x = _offset.x + p.x;
         view_data.abs_y = _offset.y + p.y;
-        node_element.style.left = _offset.x + p.x + 8 + "px";
+        node_element.style.left = _offset.x + p.x + (node.isroot ? -100 : 8) + "px";
         node_element.style.top = _offset.y + p.y + "px";
         node_element.style.display = "";
         node_element.style.visibility = "visible";
@@ -2047,15 +2050,16 @@ var $deep = 0;
     var matchText = text.match(/<.*>(.*)<.*>/g) && text.match(/<.*>(.*)<.*>/g);
     var colorfulTexts = [];
     var boldTexts = [];
-    matchText && matchText.forEach(item => {
-      var matchItem = item.match(/<.*>(.*)<.*>/)
-      if (item.includes("color")) {
-        colorfulTexts.push(matchItem[1])
-      }
-      if (item.includes("font-weight")) {
-        boldTexts.push(matchItem[1])
-      }
-    })
+    matchText &&
+      matchText.forEach((item) => {
+        var matchItem = item.match(/<.*>(.*)<.*>/);
+        if (item.includes("color")) {
+          colorfulTexts.push(matchItem[1]);
+        }
+        if (item.includes("font-weight")) {
+          boldTexts.push(matchItem[1]);
+        }
+      });
     var formatText = text.replace(/<.*>(.*)<.*>/g, "$1");
     var line = "";
     var text_len = formatText.length;
@@ -2084,11 +2088,14 @@ var $deep = 0;
           var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
           ctx.fillText(normalTextList[0], x, y);
           // 字体加粗
-          ctx.font = 'bolder 24px PingFangSC-Regular';
+          ctx.font = "bolder 24px PingFangSC-Regular";
           ctx.fillText(boldTexts[0], bolderTextX, y);
           // 初始化字体
-          ctx.font = 'normal 24px PingFangSC-Regular';
-          var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldTexts[0]).width;
+          ctx.font = "normal 24px PingFangSC-Regular";
+          var normalTextX =
+            x +
+            ctx.measureText(normalTextList[0]).width +
+            ctx.measureText(boldTexts[0]).width;
           ctx.fillText(normalTextList[1], normalTextX, y);
           boldTexts.shift();
         } else {
@@ -2111,10 +2118,13 @@ var $deep = 0;
       var normalTextList = line.split(boldTexts);
       var bolderTextX = x + ctx.measureText(normalTextList[0]).width;
       ctx.fillText(normalTextList[0], x, y);
-      var normalTextX = x + ctx.measureText(normalTextList[0]).width + ctx.measureText(boldTexts).width;
+      var normalTextX =
+        x +
+        ctx.measureText(normalTextList[0]).width +
+        ctx.measureText(boldTexts).width;
       ctx.fillText(normalTextList[1], normalTextX, y);
       // 字体加粗
-      ctx.font = 'bolder PingFangSC-Regular';
+      ctx.font = "bolder PingFangSC-Regular";
       ctx.fillText(boldTexts, bolderTextX, y);
     } else {
       ctx.fillText(line, x, y);
@@ -2237,7 +2247,7 @@ var $deep = 0;
         " " +
         css(ncs, "font-family");
       var rb = {
-        x: view_data.abs_x,
+        x: node.isroot ? view_data.abs_x - 100 : view_data.abs_x,
         y: view_data.abs_y,
         w: view_data.width + 1,
         h: view_data.height + 1,

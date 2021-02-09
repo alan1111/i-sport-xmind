@@ -1,4 +1,5 @@
 var $conTextMenu = "";
+var $firstNodeWidth = '';
 // an noop function define
 var _noop = function () {};
 var $deep = 0;
@@ -971,19 +972,13 @@ var $deep = 0;
     },
 
     canvas: {
-      bezierto: function (ctx, x1, y1, x2, y2) {
+      lineto: function (ctx, x1, y1, x2, y2) {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo((x2 - x1) / 2 + x1, y1);
         ctx.lineTo((x2 - x1) / 2 + x1, y2);
         ctx.lineTo(x2, y2);
         // ctx.bezierCurveTo(x1 + ((x2 - x1) * 2) / 3, y1, x1, y2, x2, y2);
-        ctx.stroke();
-      },
-      lineto: function (ctx, x1, y1, x2, y2) {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
         ctx.stroke();
       },
     },
@@ -1746,7 +1741,7 @@ var $deep = 0;
         p = this.layout.get_node_point(node);
         view_data.abs_x = _offset.x + p.x;
         view_data.abs_y = _offset.y + p.y;
-        node_element.style.left = _offset.x + p.x + (node.isroot ? -100 : 8) + "px";
+        node_element.style.left = _offset.x + p.x + 8 + "px";
         node_element.style.top = _offset.y + p.y + "px";
         node_element.style.display = "";
         node_element.style.visibility = "visible";
@@ -1834,9 +1829,9 @@ var $deep = 0;
       var pout = null;
       var _offset = this.get_view_offset();
       for (var nodeid in nodes) {
-        // debugger
         node = nodes[nodeid];
         if (!!node.isroot) {
+          $firstNodeWidth = node._data.view.width;
           continue;
         }
         var lineNum = node.parent.isroot ? 0 : node.data.line;
@@ -1845,7 +1840,7 @@ var $deep = 0;
         }
         pin = this.layout.get_node_point_in(node);
         pout = this.layout.get_node_point_out(node.parent);
-        this.draw_line(pout, pin, _offset, canvas_ctx, lineNum);
+        this.draw_line(pout, pin, _offset, canvas_ctx, lineNum, node);
       }
     },
 
@@ -1867,13 +1862,22 @@ var $deep = 0;
       }
       ctx.lineWidth = this.opts.line_width;
       ctx.lineCap = "round";
-
-      jm.util.canvas.bezierto(
+      var startX = '';
+      // debugger
+      if (line) {
+        startX = pin.x + offset.x;
+      } else {
+        startX = $firstNodeWidth / 2 + 20 + offset.x; //默认其实点X轴坐标为第一个node的中心位置。
+      }
+      var startY = pin.y + offset.y;
+      var endX = pout.x + offset.x;
+      var endY = pout.y + offset.y;
+      jm.util.canvas.lineto(
         ctx,
-        pin.x + offset.x,
-        pin.y + offset.y,
-        pout.x + offset.x,
-        pout.y + offset.y
+        startX,
+        startY,
+        endX,
+        endY
       );
     },
   };
@@ -2247,7 +2251,7 @@ var $deep = 0;
         " " +
         css(ncs, "font-family");
       var rb = {
-        x: node.isroot ? view_data.abs_x - 100 : view_data.abs_x,
+        x: view_data.abs_x,
         y: view_data.abs_y,
         w: view_data.width + 1,
         h: view_data.height + 1,

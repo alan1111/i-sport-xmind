@@ -1,143 +1,18 @@
-## kmsjsmap
-思维导图JS库，对hizzgdev大神的库进行二次封装，扩展右键菜单，包含拖拽节点等功能。
+## 针对项目需求，借鉴 kms-jsmind库的实现进行修改
 
-## DEMO
-https://leochan2017.github.io/kms-jsmind/
+## 安装依赖，用于打包项目 gulp
+1. npm install
 
-## 如何使用
-- 引入样式
-```
-<link rel="stylesheet" type="text/css" href="./dist/kmsjsmap.min.css">
-```
+## 打包前资源访问页面, 直接访问index.html
 
-- 引入JS库
-```
-<script type="text/javascript" src="./dist/kmsjsmap.min.js"></script>
-```
+## 打包后资源访问页面
+2. gulp
 
-## API 说明
+## 将项目地址修改为打包后资源
+    <link rel="stylesheet" type="text/css" href="./dist/kmsjsmap.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./src/kmsjsmap.css" /> -->
+    <script src="./dist/kmsjsmap.min.js" type="text/javascript"></script>
+    <!-- <script src="./src/kmsjsmap.js" type="text/javascript"></script> -->
 
-### kmsjsmap.init(Object)
-地图初始化函数
-
-参数       | 类型          | 是否必填 | 说明
----------  | ------------- | -------- | -----
-container  | String        | 是       | 容器元素ID
-data       | Array(Object) | 否       | 初始数据
-editable   | Boolean       | 否       | 是否允许编辑
-onRelation | Function      | 否       | 点击右键菜单"关联"时的回调，返回当前操作节点的信息
-
-#### data 说明
-参数      | 类型    | 是否必填 | 说明
---------- | ------- | -------- | -----
-id        | String  | 是       | 当前节点的ID
-parentid  | String  | 是       | 父节点的ID
-topic     | String  | 是       | 当前节点的内容文字
-direction | Boolean | 否       | 当前节点的方向，此数据仅在第一层节点上有效，目前仅支持 left 和 right[默认] 两种
-badge     | Number  | 否       | 当前节点的右上角小图标，如不传或传入0则不显示
-expanded  | Boolean | 否       | 是否默认展开该节点
-isLink    | Boolean | 否       | 是否链接状态
-
-#### 调用示例
-```
-kmsjsmap.init({
-    container: "jsmind_container",
-    data: [
-      { "id": "root", "isroot": true, "topic": "华北大魏有限公司" },
-      { "id": "sub1", "parentid": "root", "topic": "君主", "badge": 20, "direction": "left" },
-      { "id": "sub12", "parentid": "sub1", "topic": "曹操", "badge": 30 },
-      { "id": "sub121", "parentid": "sub1", "topic": "曹丕", "badge": 44 },
-      { "id": "sub122", "parentid": "sub1", "topic": "曹叡", "badge": 44 },
-      { "id": "sub123", "parentid": "sub1", "topic": "曹芳", "badge": 44 },
-    
-      { "id": "sub2", "parentid": "root", "topic": "军师", "badge": 66, "direction": "right" },
-      { "id": "sub21", "parentid": "sub2", "topic": "郭嘉", "badge": 233 },
-      { "id": "sub22", "parentid": "sub2", "topic": "荀彧", "badge": 9 },
-      { "id": "sub23", "parentid": "sub2", "topic": "司马懿", "badge": 7, "isLink": true },
-      { "id": "sub24", "parentid": "sub2", "topic": "贾诩", "badge": 77 },
-    
-      { "id": "sub3", "parentid": "root", "topic": "大将", "badge": 45, "direction": "right" },
-      { "id": "sub31", "parentid": "sub3", "topic": "典韦", "badge": 1 },
-      { "id": "sub32", "parentid": "sub3", "topic": "夏侯惇", "badge": 2 },
-      { "id": "sub33", "parentid": "sub3", "topic": "于禁", "badge": 3 },
-      { "id": "sub34", "parentid": "sub3", "topic": "许褚", "badge": 4, "expanded": false },
-    
-      { "id": "sub341", "parentid": "sub34", "topic": "士兵甲"},
-      { "id": "sub342", "parentid": "sub34", "topic": "士兵乙"}
-    ],
-    editable: true,
-    onRelation: function(item) {
-      console.log('当前选择中的是', item)
-      kmsjsmap.setLinkStatus({
-        id: item.id,
-        isLink: true
-      })
-    }
-})
-  
-```
-
----
-
-### kmsjsmap.save(Function)
-获取当前视图数据
-
-### 返回参数
-参数 | 类型  | 说明
------| ----  | -----
-data | Array(Object) | 当前视图数据
-
-#### 调用示例
-```
-// html:
-<a id="saveBtn" href="javascript: void(0);">保存</a>
-
-// js:
-$('#saveBtn').click(function() {
-    kmsjsmap.save(function(data) {
-      console.log('啦啦啦啦', data)
-    })
-})
-```
-
-
----
-
-### kmsjsmap.screenshot()
-对当前视图进行截图
-
-### 返回参数
-参数 | 类型  | 说明
------| ----  | -----
-File | PNG | 当前title.png
-
-#### 调用示例
-```
-// html:
-<a id="screenShot" href="javascript: void(0);">截图</a>
-
-// js:
-$('#screenShot').click(function() {
-    kmsjsmap.screenshot()
-})
-```
-
-
----
-
-### kmsjsmap.setLinkStatus(Object)
-对某个节点设置链接状态
-
-### 参数
-参数   | 类型    | 是否必填 | 说明
------- | ------- | -------- | -----
-id     | String  | 是       | 节点id
-isLink | Boolean | 是       | 是否链接状态，默认：FALSE
-
-#### 调用示例
-```
-kmsjsmap.setLinkStatus({
-    id: item.id,
-    isLink: true
-})
-```
+## 注意事项：
+1. 打包过程中如果存在dist文件，会打包失败，需要删除dist文件，再打包。

@@ -1,5 +1,5 @@
 var $conTextMenu = "";
-var $firstNodeWidth = '';
+var $firstNodeWidth = "";
 // an noop function define
 var _noop = function () {};
 var $deep = 0;
@@ -1862,7 +1862,7 @@ var $deep = 0;
       }
       ctx.lineWidth = this.opts.line_width;
       ctx.lineCap = "round";
-      var startX = '';
+      var startX = "";
       // debugger
       if (line) {
         startX = pin.x + offset.x;
@@ -1872,13 +1872,7 @@ var $deep = 0;
       var startY = pin.y + offset.y;
       var endX = pout.x + offset.x;
       var endY = pout.y + offset.y;
-      jm.util.canvas.lineto(
-        ctx,
-        startX,
-        startY,
-        endX,
-        endY
-      );
+      jm.util.canvas.lineto(ctx, startX, startY, endX, endY);
     },
   };
 
@@ -2071,14 +2065,10 @@ var $deep = 0;
     var test_line = null;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-
     for (var i = 0; i < text_len; i++) {
       test_line = line + chars[i];
-      // @todo 当文案出现\n，换行展示
-      if (
-        (ctx.measureText(test_line).width > w || chars[i] === "\n") &&
-        i > 0
-      ) {
+      // @todo 当文案出现\n，换行展示 w+30 添加文案的安全距离。
+      if (chars[i] === "\n" && i > 0) {
         if (colorfulTexts[0] && line.includes(colorfulTexts[0])) {
           var normalText = line.replace(colorfulTexts[0], "");
           var colorfulTextX = x + ctx.measureText(normalText).width;
